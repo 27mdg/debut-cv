@@ -43,6 +43,69 @@ export const steps = {
 
 export const lineHeight = { min: 1, max: 2, step: 0.05 }
 
+// The customizer's options («Modo diseño») and the values each one accepts. Every option is a
+// short fixed list, so no combination can draw a broken CV. Their defaults are in initialCv.js;
+// a look (src/templates/looks.js) changes some of them.
+export const designChoices = {
+  layout: ['single', 'margin', 'sidebar'],
+  // '' = the usual size where the CV's language is spoken
+  pageSize: ['', 'A4', 'LETTER'],
+  pageNumbers: [true, false],
+
+  sidebarSide: ['left', 'right'],
+  sidebarWidth: [1, 2, 3],
+  headerPlace: ['top', 'sidebar'],
+  sidebarFill: ['none', 'soft', 'strong'],
+  // What the narrow left column of the 'margin' layout holds
+  marginContent: ['titles', 'dates'],
+  timeline: [false, true],
+
+  headerAlign: ['left', 'center'],
+  headerFill: ['none', 'soft', 'strong'],
+  nameSize: [1, 2, 3],
+  jobTitlePlace: ['below', 'inline'],
+  contactLayout: ['row', 'rows', 'column'],
+  contactSeparator: ['dot', 'bar', 'bullet'],
+  contactIcons: [false, true],
+  linkStyle: ['short', 'full'],
+
+  photoShape: ['circle', 'rounded', 'square', 'portrait'],
+  photoSize: [1, 2, 3],
+  photoBorder: [false, true],
+  photoGrey: [false, true],
+  photoSide: ['left', 'right'],
+
+  titleStyle: ['plain', 'underline', 'shortLine', 'lineAfter', 'leftBar', 'band', 'doubleLine', 'centered'],
+  titleCase: ['asTyped', 'upper'],
+  titleSize: [1, 2, 3],
+  titleIcons: [false, true],
+
+  datePlace: ['right', 'below', 'margin'],
+  entryOrder: ['title', 'organisation'],
+  bullet: ['dot', 'dash', 'square', 'arrow', 'none'],
+  entryDivider: [false, true],
+
+  skillsDisplay: ['comma', 'columns', 'tags'],
+  skillsColumns: [1, 2, 3],
+  // Whether levels show at all is sectionSettings.skills.hideLevel; a drawing always comes with
+  // the level's word, as CV-reading software cannot read drawings
+  levelDisplay: ['word', 'dots', 'bar'],
+  languageLevelStyle: ['word', 'code'],
+
+  accentName: [true, false],
+  accentTitles: [true, false],
+  accentLines: [true, false],
+  accentIcons: [true, false],
+  accentLinks: [false, true],
+  // '' = the same font as the text
+  headingFont: ['', ...fonts.map((f) => f.id)],
+
+  decoration: ['none', 'leaves', 'geometric', 'waves', 'dots', 'frame'],
+  decorationStrength: [1, 2],
+  decorationPlace: ['corner', 'opposite', 'top'],
+  headerShape: ['straight', 'curved', 'diagonal'],
+}
+
 // Order of the date format menu; the formatting itself is formatDate in src/templates/format.js
 export const dateFormats = ['short', 'long', 'numeric']
 

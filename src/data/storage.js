@@ -2,6 +2,7 @@ import initialCv from './initialCv.js'
 import { isCustomKey } from './sections.js'
 import templates from '../templates/list.js'
 import { knownCvLanguage } from '../locales/index.js'
+import { designChoices } from './design.js'
 
 // Only in the browser (localStorage, or sessionStorage in public computer mode): the data never
 // leaves it (GDPR).
@@ -24,6 +25,19 @@ function normalizeOrder(order, cv) {
   const known = [...initialCv.sectionOrder, ...custom]
   const saved = Array.isArray(order) ? order.filter((key, i) => known.includes(key) && order.indexOf(key) === i) : []
   return [...saved, ...known.filter((key) => !saved.includes(key))]
+}
+
+// A customizer value the app does not offer (file edited by hand, or an option removed in a
+// later version) goes back to its default, so the PDF never meets an unknown value
+function validDesign(design, sectionOrder) {
+  const valid = { ...design }
+  for (const [name, choices] of Object.entries(designChoices)) {
+    if (!choices.includes(valid[name])) valid[name] = initialCv.design[name]
+  }
+  valid.sidebarSections = Array.isArray(design.sidebarSections)
+    ? design.sidebarSections.filter((key, i, list) => sectionOrder.includes(key) && list.indexOf(key) === i)
+    : initialCv.design.sidebarSections
+  return valid
 }
 
 // { version, cv } → complete CV, or null if invalid (localStorage or imported file)
@@ -56,6 +70,7 @@ export function cvFromData(data) {
   delete cv.personal.website
   delete cv.personal.linkedin
   cv.sectionOrder = normalizeOrder(cv.sectionOrder, cv)
+  cv.design = validDesign(cv.design, cv.sectionOrder)
   if (typeof cv.sectionSettings !== 'object' || cv.sectionSettings === null || Array.isArray(cv.sectionSettings)) {
     cv.sectionSettings = {}
   }
