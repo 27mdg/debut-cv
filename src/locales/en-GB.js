@@ -44,6 +44,8 @@ export default {
     contact: 'Contact',
     current: 'Present',
     monthYear: (month, year) => `${month} ${year}`,
+    pageNumber: (page, total) => `Page ${page} of ${total}`,
+    paperSize: 'A4',
     dateMonths: {
       short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       long: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],

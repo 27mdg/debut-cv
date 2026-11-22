@@ -13,7 +13,8 @@ const waiting = new Map()
 // Only when there is no worker: the PDF then uses the site's language, as switching the shared
 // texts here would switch the whole site (rare; every current browser runs the worker)
 async function buildOnPage(cv) {
-  const [{ pdf }, { cvDocument }] = await Promise.all([import('@react-pdf/renderer'), import('./document.jsx')])
+  const [{ pdf }, { cvDocument, prepareCv }] = await Promise.all([import('@react-pdf/renderer'), import('./document.jsx')])
+  await prepareCv(cv)
   return new Uint8Array(await (await pdf(cvDocument(cv)).toBlob()).arrayBuffer())
 }
 

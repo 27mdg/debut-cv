@@ -27,6 +27,15 @@ export function extendedFamily(family) {
   return `${family} Ext`
 }
 
+// The last resort for a letter missing from both files of a font (Lato has no ș, ř or ş):
+// Noto Sans has every Latin letter
+const lastResort = extendedFamily('Noto Sans')
+
+/** The PDF families to draw `font` with, in order: each letter comes from the first that has it. */
+export function fontFamilies(font) {
+  return [font.family, extendedFamily(font.id === 'helvetica' ? 'Arimo' : font.family), lastResort]
+}
+
 // An empty `design.font` means the template's own font
 export function fontOf(design, defaultFont) {
   const id = design.font || defaultFont
@@ -166,8 +175,7 @@ export function designValues(design, template) {
   // An invalid saved value (file edited by hand) is treated as normal
   const step = (list, n) => list[n - 1] ?? 1
   return {
-    // A list: letters missing from the first family (ł, ş…) come from the second
-    font: [font.family, extendedFamily(font.id === 'helvetica' ? 'Arimo' : font.family)],
+    font: fontFamilies(font),
     scale: step(steps.size, design.size),
     lineHeight: design.lineHeight,
     paragraphs: step(steps.paragraphs, design.paragraphs),

@@ -100,6 +100,10 @@ const es = {
     current: 'Presente',
     // A month and year in the CV's dates ('marzo 2021'); a function because some languages put the year first
     monthYear: (month, year) => `${month} ${year}`,
+    // On pages 2 and after of the PDF, next to the name
+    pageNumber: (page, total) => `Página ${page} de ${total}`,
+    // The usual paper where the language is spoken: 'A4' or 'LETTER' (the CV can choose another)
+    paperSize: 'A4',
     contact: 'Contacto',
     month: 'Mes',
     year: 'Año',
@@ -341,8 +345,9 @@ const es = {
     hue: 'Tono',
     hex: 'Código del color',
   },
-  // Only template names: the ids must match src/templates/list.js
+  // Only template and look names: the ids must match src/templates/list.js and looks.js
   templates: {
+    sobrio: 'Sobrio',
     arch: 'Arco',
     banner: 'Franja',
     timeline: 'Trayectoria',

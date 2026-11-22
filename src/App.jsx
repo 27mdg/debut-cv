@@ -20,6 +20,7 @@ import StartCard from './components/form/StartCard.jsx'
 import { isBlankCv, profileOrder, profiles } from './data/start.js'
 import sections, { optionalSections, customFields, isCustomKey, newCustomKey } from './data/sections.js'
 import { hasText, sectionTitle } from './templates/format.js'
+import { lookInfo, withLook } from './templates/looks.js'
 import Section from './components/form/Section.jsx'
 import ListSection from './components/form/ListSection.jsx'
 import SortableSections from './components/form/SortableSections.jsx'
@@ -223,12 +224,13 @@ function App() {
     changeSection('signature', (signature) => ({ ...signature, [field]: value }))
   }, [changeSection])
 
-  // A new template starts with its own colour and font, so it looks like its thumbnail
+  // A new template or look starts with its own colour, font and options, so it looks like its thumbnail
   const changeTemplate = useCallback((id) => {
+    const look = lookInfo(id)
     setCv((previous) => ({
       ...previous,
       template: id,
-      design: { ...previous.design, color: '', font: '' },
+      design: look ? withLook(previous.design, look) : { ...previous.design, color: '', font: '' },
     }))
   }, [])
 

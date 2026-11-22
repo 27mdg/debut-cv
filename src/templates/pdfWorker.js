@@ -1,6 +1,6 @@
 import './workerWindow.js'
 import { pdf } from '@react-pdf/renderer'
-import { cvDocument } from './document.jsx'
+import { cvDocument, prepareCv } from './document.jsx'
 import { switchLanguage } from '../locales/index.js'
 
 // Builds the PDF away from the page (pdfClient.js), so typing never waits for it. It stays
@@ -9,6 +9,7 @@ self.onmessage = async ({ data: { id, cv, language } }) => {
   try {
     // A worker has no page to tell its language: the page sends its own
     switchLanguage(language)
+    await prepareCv(cv)
     const buffer = await (await pdf(cvDocument(cv)).toBlob()).arrayBuffer()
     // Transferred, not copied
     self.postMessage({ id, buffer }, [buffer])
