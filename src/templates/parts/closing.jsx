@@ -3,12 +3,12 @@ import Text from './Text.jsx'
 import { hasText, join, formatBirthDate } from '../format.js'
 
 /** Small text at the bottom of every page (e.g. the data protection clause). Last child of <Page>. */
-export function Footer({ cv, color = '#8a8a8a' }) {
+export function Footer({ cv, color = '#8a8a8a', left = 40, right = 40 }) {
   if (!hasText(cv.footer)) return null
   return (
     <Text
       fixed
-      style={{ position: 'absolute', bottom: 12, left: 40, right: 40, fontSize: 6.5, lineHeight: 1.35, color, textAlign: 'center' }}
+      style={{ position: 'absolute', bottom: 12, left, right, fontSize: 6.5, lineHeight: 1.35, color, textAlign: 'center' }}
     >
       {cv.footer.trim()}
     </Text>

@@ -2,9 +2,10 @@ import { CvDocument } from './page.jsx'
 import { engineValues } from './values.js'
 import SingleColumn from './layouts/single.jsx'
 import MarginColumn from './layouts/margin.jsx'
+import SidebarColumns from './layouts/sidebar.jsx'
 
-// One component per layout (designChoices.layout); the sidebar one comes next
-const layouts = { single: SingleColumn, margin: MarginColumn }
+// One component per layout (designChoices.layout)
+const layouts = { single: SingleColumn, margin: MarginColumn, sidebar: SidebarColumns }
 
 /** A look's PDF: its layout drawn with the CV's customizer values. */
 export default function Engine({ cv, look }) {

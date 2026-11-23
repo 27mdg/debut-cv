@@ -21,6 +21,13 @@ const looks = [
     defaultFont: 'open-sans',
     design: { layout: 'margin', marginContent: 'titles', titleStyle: 'plain', titleCase: 'upper', titleSize: 1 },
   },
+  {
+    id: 'nitido',
+    group: 'modern',
+    defaultColor: 'teal',
+    defaultFont: 'roboto',
+    design: { layout: 'sidebar', sidebarSide: 'left', sidebarFill: 'soft', skillsDisplay: 'columns', skillsColumns: 1 },
+  },
 ]
 
 // The first templates, replaced by looks: a saved CV that used one opens with the closest look

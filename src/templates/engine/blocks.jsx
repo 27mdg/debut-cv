@@ -79,7 +79,40 @@ function entryBlock(key, item, ctx) {
 
 const commaField = { hobbies: 'interest', qualities: 'quality' }
 
-// Skills as comma lists, one per category (the category's name first, in bold)
+function skillWithLevel(item) {
+  return item.level !== '' ? `${item.skill} (${texts.common.skillLevels[item.level]})` : item.skill
+}
+
+// Skills one per line, in `columns` columns; each row is its own block, so a long list flows
+// onto the next page instead of being squeezed
+function skillRows(groups, ctx) {
+  const { v, width, design } = ctx
+  const columns = design.skillsColumns
+  const gap = 12
+  const cell = (width - gap * (columns - 1)) / columns
+  return groups.flatMap((group, g) => {
+    const items = group.items.filter((item) => hasText(item.skill))
+    const rows = []
+    for (let i = 0; i < items.length; i += columns) rows.push(items.slice(i, i + columns))
+    return rows.map((row, r) => ({
+      key: `g${g}r${r}`,
+      gap: r === 0 && g > 0 ? 5 * v.paragraphs : 2 * v.paragraphs,
+      head: [
+        r === 0 && hasText(group.name) && (
+          <Text key="name" style={{ fontWeight: 'bold', marginBottom: 2 * v.paragraphs }}>{fitWords(group.name, width, textFont(v, true))}</Text>
+        ),
+        <View key="row" style={{ flexDirection: 'row' }}>
+          {row.map((item, i) => (
+            <Text key={item.id} style={{ width: cell, marginLeft: i ? gap : 0 }}>{fitWords(skillWithLevel(item), cell, textFont(v))}</Text>
+          ))}
+        </View>,
+      ].filter(Boolean),
+      rest: [],
+    }))
+  })
+}
+
+// Skills grouped by category; as comma lists (the category's name first, in bold) or in rows
 function skillBlocks(list, ctx) {
   const { v, width } = ctx
   const groups = []
@@ -87,10 +120,11 @@ function skillBlocks(list, ctx) {
     if (item.categoryHead || groups.length === 0) groups.push({ name: item.categoryHead ?? '', items: [] })
     groups.at(-1).items.push(item)
   }
+  if (ctx.design.skillsDisplay === 'columns') return skillRows(groups, ctx)
   return groups.map((group, i) => {
     const words = group.items
       .filter((item) => hasText(item.skill))
-      .map((item) => (item.level !== '' ? `${item.skill} (${texts.common.skillLevels[item.level]})` : item.skill))
+      .map(skillWithLevel)
     return {
       key: `g${i}`,
       gap: 3 * v.paragraphs,
@@ -140,9 +174,17 @@ export function sectionBlocks({ key, list, text }, ctx) {
   return list.map((item) => entryBlock(key, item, ctx))
 }
 
-/** The personal details beyond contact ('Fecha de nacimiento: …'), in two columns. */
-export function detailsBlocks(lines, ctx) {
+/** The personal details beyond contact ('Fecha de nacimiento: …'), in two columns or one. */
+export function detailsBlocks(lines, ctx, columns = 2) {
   const { v, width } = ctx
+  if (columns === 1) {
+    return lines.map((line, i) => ({
+      key: `d${i}`,
+      gap: 2 * v.paragraphs,
+      head: [<Text key="line">{fitWords(line, width, textFont(v))}</Text>],
+      rest: [],
+    }))
+  }
   const half = (width - 16) / 2
   return [{
     key: 'details',

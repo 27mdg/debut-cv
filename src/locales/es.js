@@ -349,6 +349,7 @@ const es = {
   templates: {
     sobrio: 'Sobrio',
     europeo: 'Europeo',
+    nitido: 'Nítido',
     arch: 'Arco',
     banner: 'Franja',
     timeline: 'Trayectoria',

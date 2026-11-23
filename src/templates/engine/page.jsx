@@ -30,8 +30,10 @@ export function CvDocument({ cv, children }) {
 /**
  * One flowing page of the CV: its size, room for the footer and, from page 2 on, the name and
  * page number in the top margin (sheets printed loose can be put back together).
+ * `clear`: { left, right }, the page's edges kept free of coloured bands, where the page number
+ * and the footer go.
  */
-export function CvPage({ cv, v, style, children }) {
+export function CvPage({ cv, v, style, clear = {}, children }) {
   const name = join([cv.personal.firstName, cv.personal.lastName], ' ')
   return (
     <Page size={v.pageSize} style={pageWithFooter(style, cv)}>
@@ -42,8 +44,8 @@ export function CvPage({ cv, v, style, children }) {
           style={{
             position: 'absolute',
             top: Math.max(8, v.marginY / 2 - 5),
-            left: v.marginX,
-            right: v.marginX,
+            left: clear.left ?? v.marginX,
+            right: clear.right ?? v.marginX,
             fontSize: 7.5,
             textAlign: 'right',
             color: v.muted,
@@ -53,7 +55,7 @@ export function CvPage({ cv, v, style, children }) {
             : '')}
         />
       )}
-      <Footer cv={cv}/>
+      <Footer cv={cv} left={clear.left ?? 40} right={clear.right ?? 40}/>
     </Page>
   )
 }
