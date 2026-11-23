@@ -113,3 +113,11 @@ src/
 A look is only data: a layout plus the customizer values that differ from the defaults, with
 its own colour and font. Adding one means a few lines in `src/templates/looks.js` and its name
 in the locale file.
+
+## Licence
+
+© 2026 Marcos Domínguez Galán. All rights reserved.
+
+This code is public so others can see my work. You may read it, but you may not copy, modify,
+distribute or reuse it, in whole or in part, without my written permission. The open-source
+libraries and open-licence fonts it uses keep their own licences. See [LICENSE](LICENSE).
