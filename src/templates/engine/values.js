@@ -43,6 +43,22 @@ export function engineFamilies(design, look) {
   return [...new Set([...v.font, ...v.headingFont])]
 }
 
+/** The page's own style: margins, and the text every part inherits. */
+export function pageStyle(v) {
+  return {
+    paddingTop: v.marginY,
+    paddingBottom: v.marginY,
+    paddingHorizontal: v.marginX,
+    fontFamily: v.font,
+    fontSize: v.textSize,
+    lineHeight: v.lineHeight,
+    color: v.ink,
+  }
+}
+
+/** Space between a margin column and the content beside it, in points. */
+export const marginGap = 18
+
 /** The body text's font, as measure.js takes it. */
 export function textFont(v, bold = false) {
   return { family: v.font[0], size: v.textSize, bold }

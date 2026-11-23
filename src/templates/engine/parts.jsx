@@ -3,7 +3,7 @@ import { View, Image, Link } from '@react-pdf/renderer'
 import Text from '../parts/Text.jsx'
 import { fullUrl, hasText } from '../format.js'
 import { fitWords, fittingSize } from './measure.js'
-import { textFont } from './values.js'
+import { marginGap, textFont } from './values.js'
 
 // The components every layout is built from. `ctx` = { cv, v (engineValues), design, width },
 // where `width` is the column's text width in points (long words are split to fit it).
@@ -38,10 +38,19 @@ export function Segments({ segments, width, v }) {
   })
 }
 
-function SectionTitle({ title, ctx }) {
-  const { v, design, width } = ctx
-  const size = [10, 11, 12.5][design.titleSize - 1] * v.scale
+// Uppercase titles take this much extra room per letter
+const titleSpacing = 0.5
+
+// `width`: the room for the title; in a narrow margin column it shrinks a little so that its
+// longest word fits whole ("EXTRACURRICULARES") instead of being split
+function SectionTitle({ title, ctx, width }) {
+  const { v, design } = ctx
   const upper = design.titleCase === 'upper'
+  const shown = upper ? title.toUpperCase() : title
+  const longest = shown.split(/\s+/).reduce((a, b) => (b.length > a.length ? b : a), '')
+  const room = width - (upper ? titleSpacing * longest.length : 0)
+  const font = { family: v.headingFont[0], size: [10, 11, 12.5][design.titleSize - 1] * v.scale, bold: true }
+  const size = fittingSize(longest, room, font, 0.8)
   return (
     <View>
       <Text
@@ -51,14 +60,13 @@ function SectionTitle({ title, ctx }) {
           fontWeight: 'bold',
           lineHeight: 1.25,
           // Wider spacing would make CV-reading software read "P E R F I L"
-          letterSpacing: upper ? 0.5 : 0,
-          textTransform: upper ? 'uppercase' : 'none',
+          letterSpacing: upper ? titleSpacing : 0,
           color: v.titleColor,
         }}
       >
-        {fitWords(title, width, { family: v.headingFont[0], size, bold: true })}
+        {fitWords(shown, room, { ...font, size })}
       </Text>
-      <View style={{ height: 0.8, marginTop: 3, backgroundColor: v.lineColor }}/>
+      {design.titleStyle !== 'plain' && <View style={{ height: 0.8, marginTop: 3, backgroundColor: v.lineColor }}/>}
     </View>
   )
 }
@@ -66,21 +74,28 @@ function SectionTitle({ title, ctx }) {
 /**
  * A section: its title stays on the same page as the first block's head (never alone at the
  * bottom of a page); every block's head is kept together and the rest flows across pages.
+ * With `margin` (the title column's width, in points) the title goes in a column on the left
+ * and the content beside it; `ctx.width` is then the content's width.
  */
-export function Section({ title, blocks, ctx, first = false }) {
+export function Section({ title, blocks, ctx, first = false, margin = 0 }) {
   if (blocks.length === 0) return null
   const [one, ...others] = blocks
+  // Every piece of content is indented on its own, rather than the whole column being one box
+  // beside the title, so that the content can still flow across pages
+  const indent = margin ? { marginLeft: margin + marginGap } : {}
   return (
     <View style={{ marginTop: first ? 0 : 15 * ctx.v.sections }}>
-      <View wrap={false}>
-        <SectionTitle title={title} ctx={ctx}/>
-        <View style={{ marginTop: 5 }}>{one.head}</View>
+      <View wrap={false} style={margin ? { flexDirection: 'row' } : {}}>
+        <View style={margin ? { width: margin } : {}}>
+          <SectionTitle title={title} ctx={ctx} width={margin || ctx.width}/>
+        </View>
+        <View style={margin ? { flex: 1, marginLeft: marginGap } : { marginTop: 5 }}>{one.head}</View>
       </View>
-      {one.rest}
+      <View style={indent}>{one.rest}</View>
       {others.map((block) => (
         <Fragment key={block.key}>
-          <View wrap={false} style={{ marginTop: block.gap }}>{block.head}</View>
-          {block.rest}
+          <View wrap={false} style={[indent, { marginTop: block.gap }]}>{block.head}</View>
+          <View style={indent}>{block.rest}</View>
         </Fragment>
       ))}
     </View>

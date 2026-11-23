@@ -14,6 +14,13 @@ const looks = [
     defaultFont: 'lato',
     design: { layout: 'single', titleStyle: 'underline', titleCase: 'upper' },
   },
+  {
+    id: 'europeo',
+    group: 'classic',
+    defaultColor: 'navy',
+    defaultFont: 'open-sans',
+    design: { layout: 'margin', marginContent: 'titles', titleStyle: 'plain', titleCase: 'upper', titleSize: 1 },
+  },
 ]
 
 // The first templates, replaced by looks: a saved CV that used one opens with the closest look

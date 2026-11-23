@@ -348,6 +348,7 @@ const es = {
   // Only template and look names: the ids must match src/templates/list.js and looks.js
   templates: {
     sobrio: 'Sobrio',
+    europeo: 'Europeo',
     arch: 'Arco',
     banner: 'Franja',
     timeline: 'Trayectoria',
