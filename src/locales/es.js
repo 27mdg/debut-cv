@@ -1,7 +1,7 @@
 // To add a language: copy this file (e.g. en.js) and translate the values.
 const es = {
   app: {
-    title: 'CV Gratis',
+    title: 'Debut CV',
   },
   personal: {
     title: 'Datos personales',
@@ -361,8 +361,8 @@ const es = {
     importTooltip: 'Abre un archivo que exportaste antes y continúa tu CV justo donde lo dejaste.',
     export: 'Exportar',
     exportTooltip: 'Guarda en tu equipo un archivo con todo lo que has rellenado hasta ahora. Con «Importar» podrás seguir más tarde, también en otro ordenador.',
-    errorInvalid: 'Este archivo no es un CV de CV Gratis.',
-    errorVersion: 'Este archivo es de una versión de CV Gratis que no se puede abrir.',
+    errorInvalid: 'Este archivo no es un CV de Debut CV.',
+    errorVersion: 'Este archivo es de una versión de Debut CV que no se puede abrir.',
   },
   reorder: {
     handle: 'Arrastra para cambiar el orden de la sección',
