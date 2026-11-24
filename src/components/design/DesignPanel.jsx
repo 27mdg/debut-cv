@@ -2,11 +2,11 @@ import { memo } from 'react'
 import texts from '../../locales/index.js'
 import { designChoices } from '../../data/design.js'
 import { isCustomized, lookInfo } from '../../templates/looks.js'
-import { ArrowIcon, LayoutIcon } from '../Icons.jsx'
+import { ArrowIcon, LayoutIcon, PersonIcon } from '../Icons.jsx'
 import { Thumbnail } from '../TemplatePicker.jsx'
 import Segmented from '../Segmented.jsx'
 import OptionTiles from './OptionTiles.jsx'
-import { LayoutPicture } from './pictures.jsx'
+import { ContactPicture, LayoutPicture } from './pictures.jsx'
 
 function Group({ title, icon: Icon, open, children }) {
   return (
@@ -30,6 +30,58 @@ function Option({ title, children }) {
   )
 }
 
+// A Segmented for one design option; `labels` names each of its values (an object, or an array
+// for the steps 1, 2, 3)
+function Choice({ name, title, labels, design, onChange }) {
+  const label = (value) => (Array.isArray(labels) ? labels[value - 1] : labels[value])
+  return (
+    <Option title={title}>
+      <Segmented label={title} value={design[name]} onChange={(value) => onChange(name, value)}
+        options={designChoices[name].map((value) => ({ value, label: label(value) }))}/>
+    </Option>
+  )
+}
+
+function Header({ design, onChange }) {
+  const t = texts.design
+  const contactLayouts = designChoices.contactLayout.map((value) => ({
+    value, label: t.contactLayouts[value], picture: <ContactPicture layout={value}/>,
+  }))
+  // The separator parts the contact details (icons do that themselves) and the inline job title
+  const separated = !design.contactIcons || design.jobTitlePlace === 'inline'
+  const separators = { dot: '·', bar: '|', bullet: '•' }
+  return (
+    <>
+      <Choice name="headerAlign" title={t.headerAlign} labels={t.aligns} design={design} onChange={onChange}/>
+      <Choice name="nameSize" title={t.nameSize} labels={t.sizes} design={design} onChange={onChange}/>
+      <Choice name="jobTitlePlace" title={t.jobTitlePlace} labels={t.jobTitlePlaces} design={design} onChange={onChange}/>
+      <Option title={t.contactLayout}>
+        <OptionTiles label={t.contactLayout} options={contactLayouts} value={design.contactLayout}
+          onChange={(value) => onChange('contactLayout', value)}/>
+        <label className="switch-label design-switch">
+          <span>{t.contactIcons}</span>
+          <input type="checkbox" role="switch" className="toggle" checked={design.contactIcons}
+            onChange={(e) => onChange('contactIcons', e.target.checked)}/>
+        </label>
+      </Option>
+      {separated && (
+        <Option title={t.contactSeparator}>
+          <Segmented label={t.contactSeparator} value={design.contactSeparator} onChange={(value) => onChange('contactSeparator', value)}
+            options={designChoices.contactSeparator.map((value) => ({
+              value, label: <span className="separator-glyph">{separators[value]}</span>, name: t.separatorNames[value],
+            }))}/>
+        </Option>
+      )}
+      <Option title={t.linkStyle}>
+        <p className="menu-note">{t.linkNote}</p>
+        <Segmented label={t.linkStyle} value={design.linkStyle} onChange={(value) => onChange('linkStyle', value)}
+          options={designChoices.linkStyle.map((value) => ({ value, label: t.linkStyles[value] }))}/>
+      </Option>
+      <Choice name="headerFill" title={t.headerFill} labels={t.fills} design={design} onChange={onChange}/>
+    </>
+  )
+}
+
 function Structure({ design, sections, onChange }) {
   const t = texts.design
   const layouts = designChoices.layout.map((value) => ({
@@ -48,18 +100,9 @@ function Structure({ design, sections, onChange }) {
       </Option>
       {design.layout === 'sidebar' && (
         <>
-          <Option title={t.sidebarSide}>
-            <Segmented label={t.sidebarSide} value={design.sidebarSide} onChange={(value) => onChange('sidebarSide', value)}
-              options={designChoices.sidebarSide.map((value) => ({ value, label: t.sides[value] }))}/>
-          </Option>
-          <Option title={t.sidebarWidth}>
-            <Segmented label={t.sidebarWidth} value={design.sidebarWidth} onChange={(value) => onChange('sidebarWidth', value)}
-              options={designChoices.sidebarWidth.map((value) => ({ value, label: t.widths[value - 1] }))}/>
-          </Option>
-          <Option title={t.sidebarFill}>
-            <Segmented label={t.sidebarFill} value={design.sidebarFill} onChange={(value) => onChange('sidebarFill', value)}
-              options={designChoices.sidebarFill.map((value) => ({ value, label: t.fills[value] }))}/>
-          </Option>
+          <Choice name="sidebarSide" title={t.sidebarSide} labels={t.sides} design={design} onChange={onChange}/>
+          <Choice name="sidebarWidth" title={t.sidebarWidth} labels={t.widths} design={design} onChange={onChange}/>
+          <Choice name="sidebarFill" title={t.sidebarFill} labels={t.fills} design={design} onChange={onChange}/>
           <Option title={t.sidebarSections}>
             <p className="menu-note">{sections.length ? t.sidebarNote : t.noSections}</p>
             {sections.map(({ key, title }) => (
@@ -108,9 +151,14 @@ function DesignPanel({ template, design, sections, onChange, onReset, onClose })
           )}
         </div>
         {look ? (
-          <Group title={t.groups.structure} icon={LayoutIcon} open>
-            <Structure design={design} sections={sections} onChange={onChange}/>
-          </Group>
+          <>
+            <Group title={t.groups.structure} icon={LayoutIcon} open>
+              <Structure design={design} sections={sections} onChange={onChange}/>
+            </Group>
+            <Group title={t.groups.header} icon={PersonIcon}>
+              <Header design={design} onChange={onChange}/>
+            </Group>
+          </>
         ) : (
           <p className="menu-note design-old">{t.oldTemplate}</p>
         )}

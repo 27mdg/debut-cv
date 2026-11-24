@@ -48,7 +48,8 @@ export default function SidebarColumns({ cv, v }) {
       <View style={{ flexDirection: left ? 'row-reverse' : 'row' }}>
         <View style={{ width: main.width, [left ? 'marginLeft' : 'marginRight']: columnGap, [left ? 'marginRight' : 'marginLeft']: v.marginX }}>
           <View style={{ paddingBottom: columnTop }}>
-            <Header cv={cv} details={details} ctx={main}/>
+            <Header cv={cv} details={details} ctx={main}
+              bleed={{ top: v.marginY, left: left ? columnGap : v.marginX, right: left ? v.marginX : columnGap }}/>
           </View>
           {sections.filter(({ key }) => !inSidebar(key)).map((section, i) => (
             <Section key={section.key} first={i === 0} title={sectionTitle(cv, section.key)} blocks={sectionBlocks(section, main)} ctx={main}/>

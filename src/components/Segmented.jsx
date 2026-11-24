@@ -2,7 +2,8 @@ import { useLayoutEffect, useRef } from 'react'
 
 /**
  * A few choices side by side. The chosen one sits on a white pill that glides to the new
- * choice and takes its width. `options`: [{ value, label }].
+ * choice and takes its width. `options`: [{ value, label, name }]; `name` (optional) names a
+ * label that is only a symbol, for screen readers and the hint bubble.
  */
 function Segmented({ label, options, value, onChange }) {
   const buttons = useRef({})
@@ -28,6 +29,8 @@ function Segmented({ label, options, value, onChange }) {
           ref={(element) => { buttons.current[option.value] = element }}
           type="button"
           aria-pressed={option.value === value}
+          aria-label={option.name}
+          data-hint={option.name}
           onClick={() => onChange(option.value)}
         >
           {option.label}

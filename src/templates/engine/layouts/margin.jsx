@@ -20,7 +20,7 @@ export default function MarginColumn({ cv, v }) {
   const sections = filledSections(cv)
   return (
     <CvPage cv={cv} v={v} style={pageStyle(v)}>
-      <Header cv={cv} details={details} ctx={header}/>
+      <Header cv={cv} details={details} ctx={header} bleed={{ top: v.marginY, left: v.marginX, right: v.marginX }}/>
       <View style={{ marginTop: 6 * v.sections }}>
         {details.otherDetails.length > 0 && (
           <Section title={texts.personal.title} blocks={detailsBlocks(details.otherDetails, ctx)} ctx={ctx} margin={margin}/>

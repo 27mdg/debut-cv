@@ -34,6 +34,7 @@ export function engineValues(design, look) {
     titleColor: design.accentTitles ? v.accentText : ink,
     lineColor: design.accentLines ? v.accent : ink,
     linkColor: design.accentLinks ? v.accentText : 'inherit',
+    iconColor: design.accentIcons ? v.accentText : ink,
   }
 }
 
