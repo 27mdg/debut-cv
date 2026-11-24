@@ -1,7 +1,9 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { flushSync } from 'react-dom'
 import texts, { language } from '../locales/index.js'
+import { filledSections, sectionTitle } from '../templates/format.js'
 import Toolbar from './Toolbar.jsx'
+import DesignPanel from './design/DesignPanel.jsx'
 import { prefersReducedMotion } from './useLeaving.js'
 
 // Loaded separately (lazy) because the PDF library is heavy: the form shows up instantly and
@@ -77,25 +79,48 @@ function withTransition(update, direction) {
  * for React to redraw what changed, and from App that was the whole form, which froze the
  * start of the animation on modest computers.
  */
-function PreviewPanel({ cv, onTemplateChange, onDesignChange, onLanguageChange }) {
+function PreviewPanel({ cv, onTemplateChange, onDesignChange, onDesignReset, onLanguageChange }) {
   const [fullScreen, setFullScreen] = useState(false)
+  // «Modo diseño» is full screen with the design panel; closing it goes back to what was before
+  const [designMode, setDesignMode] = useState(false)
+  const shownFull = fullScreen || designMode
 
-  // Stable, so the toolbar (memo) does not redraw on every keystroke
+  // Stable, so the toolbar (memo) does not redraw on every keystroke. Leaving full screen from
+  // the toolbar also closes «Modo diseño».
   const changeFullScreen = useCallback((value) => {
-    withTransition(() => setFullScreen(value), value ? 'enter' : 'exit')
+    withTransition(() => {
+      setFullScreen(value)
+      if (!value) setDesignMode(false)
+    }, value ? 'enter' : 'exit')
   }, [])
 
+  const changeDesignMode = useCallback((value) => {
+    withTransition(() => setDesignMode(value), value ? 'enter' : 'exit')
+  }, [])
+  const openDesignMode = useCallback(() => changeDesignMode(true), [changeDesignMode])
+  const closeDesignMode = useCallback(() => changeDesignMode(false), [changeDesignMode])
+
   useEffect(() => {
-    if (!fullScreen) return
+    if (!shownFull) return
     function handleKeyDown(e) {
-      if (e.key === 'Escape') withTransition(() => setFullScreen(false), 'exit')
+      if (e.key !== 'Escape') return
+      if (designMode) closeDesignMode()
+      else changeFullScreen(false)
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [fullScreen])
+  }, [shownFull, designMode, closeDesignMode, changeFullScreen])
+
+  // Kept as text so the list (and the panel, memo) only changes when a section fills, empties or is renamed
+  const sectionsText = designMode ? JSON.stringify(filledSections(cv).map(({ key }) => ({ key, title: sectionTitle(cv, key) }))) : '[]'
+  const sections = useMemo(() => JSON.parse(sectionsText), [sectionsText])
 
   return (
-    <section className={fullScreen ? 'preview-panel full-screen' : 'preview-panel'}>
+    <section className={['preview-panel', shownFull && 'full-screen', designMode && 'design-mode'].filter(Boolean).join(' ')}>
+      {designMode && (
+        <DesignPanel template={cv.template} design={cv.design} sections={sections}
+          onChange={onDesignChange} onReset={onDesignReset} onClose={closeDesignMode}/>
+      )}
       <Suspense fallback={<p className="loading">{texts.preview.loading}</p>}>
         <Preview cv={cv}/>
       </Suspense>
@@ -106,8 +131,9 @@ function PreviewPanel({ cv, onTemplateChange, onDesignChange, onLanguageChange }
         onDesignChange={onDesignChange}
         language={cv.language || language}
         onLanguageChange={onLanguageChange}
-        fullScreen={fullScreen}
+        fullScreen={shownFull}
         onFullScreenChange={changeFullScreen}
+        onCustomize={designMode ? undefined : openDesignMode}
       />
     </section>
   )

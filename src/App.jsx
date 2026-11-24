@@ -246,6 +246,17 @@ function App() {
     })
   }, [offerUndo])
 
+  // «Restablecer» in «Modo diseño»: the look's own design again, with «Deshacer»
+  const resetDesign = useCallback(() => {
+    const { template, design } = latestCv.current
+    const look = lookInfo(template)
+    if (!look) return
+    setCv((previous) => ({ ...previous, design: withLook(previous.design, look) }))
+    offerUndo(texts.design.resetUndo(texts.templates[template] ?? template), () => {
+      setCv((previous) => ({ ...previous, design }))
+    })
+  }, [offerUndo])
+
   // What is still waiting to be saved of the open CV, written now (before opening another)
   function saveNow() {
     if (unsaved.current) save(unsaved.current)
@@ -658,7 +669,7 @@ function App() {
           </section>
           <Splitter/>
           <PreviewPanel cv={cv} onTemplateChange={changeTemplate} onDesignChange={changeDesign}
-            onLanguageChange={changeLanguage}/>
+            onDesignReset={resetDesign} onLanguageChange={changeLanguage}/>
         </main>
         <UndoToast undos={undos.list} shown={undos.shown} onShow={showUndo} onUndo={runUndo} onClose={closeUndo}/>
         <HintLayer/>

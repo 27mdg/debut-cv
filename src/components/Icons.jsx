@@ -248,6 +248,14 @@ export function LinkIcon() {
   return <Icon><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></Icon>
 }
 
+export function TuneIcon() {
+  return <Icon><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></Icon>
+}
+
+export function LayoutIcon() {
+  return <Icon><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M10 9v11"/></Icon>
+}
+
 export function UndoIcon() {
   return <Icon><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></Icon>
 }

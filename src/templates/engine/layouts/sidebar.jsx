@@ -17,8 +17,9 @@ function sidebarValues(v, fill) {
   return { ...v, ink: v.onAccent, muted: v.onAccentMuted, nameColor: v.onAccent, titleColor: v.onAccent, lineColor: v.onAccentMuted, linkColor: v.onAccent }
 }
 
-// «Barra lateral»: the header across the top, then a main column and a narrower sidebar holding
-// the sections the user chose (design.sidebarSections). The main column comes first in the PDF,
+// «Barra lateral»: a main column, with the header at its top, and a narrower sidebar holding the
+// sections the user chose (design.sidebarSections). The band runs the whole height of every page:
+// a white header across it looked like a bar cut short. The main column comes first in the PDF,
 // so CV-reading software reads the name, the profile and the experience first.
 export default function SidebarColumns({ cv, v }) {
   const { design } = cv
@@ -31,7 +32,6 @@ export default function SidebarColumns({ cv, v }) {
   const sideV = sidebarValues(v, fill)
   const main = { cv, v, design, width: v.pageWidth - band - columnGap - v.marginX }
   const side = { cv, v: sideV, design, width: band - outer - inner }
-  const header = { cv, v, design, width: v.pageWidth - 2 * v.marginX }
 
   const details = personalDetails(cv.personal)
   const sections = filledSections(cv)
@@ -45,18 +45,17 @@ export default function SidebarColumns({ cv, v }) {
       {fill !== 'none' && (
         <View fixed style={{ position: 'absolute', top: 0, bottom: 0, width: band, backgroundColor: bandColor, [left ? 'left' : 'right']: 0 }}/>
       )}
-      {/* White behind the header, from the very top of the page, so the band starts below it */}
-      <View style={{ marginTop: -v.marginY, paddingTop: v.marginY, paddingBottom: 12 * v.sections, paddingHorizontal: v.marginX, backgroundColor: '#ffffff' }}>
-        <Header cv={cv} details={details} ctx={header}/>
-      </View>
       <View style={{ flexDirection: left ? 'row-reverse' : 'row' }}>
-        <View style={{ width: main.width, paddingTop: columnTop, [left ? 'marginLeft' : 'marginRight']: columnGap, [left ? 'marginRight' : 'marginLeft']: v.marginX }}>
+        <View style={{ width: main.width, [left ? 'marginLeft' : 'marginRight']: columnGap, [left ? 'marginRight' : 'marginLeft']: v.marginX }}>
+          <View style={{ paddingBottom: columnTop }}>
+            <Header cv={cv} details={details} ctx={main}/>
+          </View>
           {sections.filter(({ key }) => !inSidebar(key)).map((section, i) => (
             <Section key={section.key} first={i === 0} title={sectionTitle(cv, section.key)} blocks={sectionBlocks(section, main)} ctx={main}/>
           ))}
           <Signature cv={cv}/>
         </View>
-        <View style={{ width: band, paddingTop: columnTop, paddingLeft: left ? outer : inner, paddingRight: left ? inner : outer, color: sideV.ink }}>
+        <View style={{ width: band, paddingLeft: left ? outer : inner, paddingRight: left ? inner : outer, color: sideV.ink }}>
           {details.otherDetails.length > 0 && (
             <Section first title={texts.personal.title} blocks={detailsBlocks(details.otherDetails, side, 1)} ctx={side}/>
           )}

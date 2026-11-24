@@ -48,6 +48,15 @@ export function withLook(design, look) {
   return { ...design, ...options, sidebarSections: initialCv.design.sidebarSections, ...look.design, color: '', font: '' }
 }
 
+/** Whether `design` differs from the look's own (its options, colour or font were changed). */
+export function isCustomized(design, look) {
+  const original = withLook(design, look)
+  const names = [...Object.keys(designChoices), 'sidebarSections', 'color', 'font']
+  // The sidebar's sections are a set: their order in the list means nothing
+  const plain = (value) => JSON.stringify(Array.isArray(value) ? [...value].sort() : value)
+  return names.some((name) => plain(design[name]) !== plain(original[name]))
+}
+
 /** A look's entry by id, or undefined. */
 export function lookInfo(id) {
   return looks.find((look) => look.id === id)

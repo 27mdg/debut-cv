@@ -367,6 +367,79 @@ button:hover .trash-lid { rotate: -16deg; }
 .template-thumbnail { display: block; width: 150px; aspect-ratio: 210 / 297; overflow: hidden; border-radius: var(--r-sm); background: var(--sunken); box-shadow: var(--e1); }
 .template-card.selected .template-thumbnail { box-shadow: var(--e1), 0 0 0 2px var(--forest); }
 .template-thumbnail img { display: block; width: 100%; height: 100%; }
+/* Group tabs on the left, «Personalizar diseño» on the right; they wrap on a narrow preview */
+.template-picker-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 2px 2px 10px; }
+
+/* «Modo diseño» (DesignPanel.jsx): full screen with a paper panel on the left. The panel's room
+   is padding, so the preview's container queries (two pages, icon-only toolbar) measure only
+   what is left beside it. A paper card, not glass: it holds controls, like the form. */
+.preview-panel.design-mode { --panel-room: 420px; box-sizing: border-box; padding-left: var(--panel-room); }
+.preview-panel.design-mode .toolbar-dock { left: calc(var(--panel-room) + (100% - var(--panel-room)) / 2); }
+.design-panel { position: absolute; top: 16px; bottom: 16px; left: 16px; z-index: 6; display: flex; flex-direction: column; width: calc(var(--panel-room) - 32px); overflow: hidden; border-radius: var(--r-lg); background: var(--paper); box-shadow: var(--e3); }
+.design-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px 14px; }
+.design-head h2 { margin: 0; font-family: var(--font-heading); font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+.design-scroll { flex: 1; overflow-y: auto; padding: 0 14px 20px; }
+.design-look { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 10px 12px 10px 10px; border-radius: var(--r-md); background: var(--card); box-shadow: var(--card-edge); }
+.design-look .template-thumbnail { flex: none; width: 48px; border-radius: 4px; }
+.design-look-text { display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
+.design-look-text b { font-size: 15px; }
+.design-look-text small { color: var(--ink-muted); font-size: 13px; }
+.design-reset { flex: none; color: var(--forest); }
+.design-old { margin: 4px 6px; }
+/* The form's section cards, a size smaller */
+.design-panel .design-group { padding-inline: 14px; }
+.design-panel .design-group > summary { gap: 12px; padding: 12px 0; }
+.design-panel .design-group > summary h2 { font-size: 19px; }
+.design-panel .design-group .section-icon { width: 34px; height: 34px; }
+.design-panel .design-group .section-content { padding-bottom: 16px; }
+.design-option { margin-bottom: 14px; }
+.design-option .menu-subtitle { margin: 2px 2px 8px; }
+.design-option .menu-note { margin: 0 2px 10px; }
+.design-option .segmented { display: flex; }
+.design-option .segmented button { flex: 1; }
+.design-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 2px; font-size: 14px; cursor: pointer; }
+/* Gliding in from the left with full screen (named only meanwhile, like the toolbar) */
+:root:active-view-transition .design-panel { view-transition-name: design-panel; }
+::view-transition-new(design-panel):only-child { animation: panel-in 0.4s var(--spring) both; }
+::view-transition-old(design-panel):only-child { animation: panel-in 0.3s var(--spring) reverse both; }
+@keyframes panel-in { from { translate: -110% 0; } }
+/* Leaving, the panel slides out over the top bar fading back in, not behind it */
+::view-transition-group(design-panel) { z-index: 10; }
+/* Unnamed, the undo notice stayed in the page's snapshot under the gliding pages, then jumped
+   back on top at the end. Named, it stays above everything and glides to its new place. Its
+   glass goes on the moving box, as for the toolbar. */
+:root:active-view-transition .undo-toast { view-transition-name: undo-toast; -webkit-backdrop-filter: none; backdrop-filter: none; }
+::view-transition-group(undo-toast) {
+  z-index: 20; border-radius: var(--r-pill); -webkit-backdrop-filter: var(--frost-blur); backdrop-filter: var(--frost-blur);
+}
+/* At the bottom, the undo notice met the panel or the toolbar and its menus: it goes to the top
+   of the CV's side instead */
+.app:has(.preview-panel.design-mode) .undo-toast { top: 20px; bottom: auto; left: calc(420px + (100vw - 420px) / 2); transform: translateX(-50%); }
+/* A narrow window has no room beside the CV: the panel becomes a sheet over its lower part,
+   above the toolbar */
+@media (max-width: 820px) {
+  .preview-panel.design-mode { --panel-room: 0px; }
+  .design-panel { top: auto; right: 16px; bottom: 88px; width: auto; height: 55vh; }
+  .app:has(.preview-panel.design-mode) .undo-toast { top: 16px; left: 50%; }
+}
+
+/* OptionTiles.jsx: a small drawn page per choice; the chosen one forest on mint */
+.option-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.option-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px 8px; border: none; border-radius: var(--r-sm); background: var(--paper); box-shadow: 0 0 0 1px var(--line); color: var(--ink); font: inherit; font-size: 12.5px; line-height: 1.25; cursor: pointer; transition: box-shadow var(--t-fast), background-color var(--t-fast), scale var(--t-fast); }
+.option-tile:hover { box-shadow: 0 0 0 1px var(--line-strong); }
+.option-tile:active { scale: 0.97; }
+.option-tile.chosen { background: var(--mint); box-shadow: 0 0 0 2px var(--forest); color: var(--forest); font-weight: 600; }
+.option-tile:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.option-picture svg { display: block; }
+.pic-sheet { fill: var(--surface); stroke: var(--line-strong); }
+.pic-text { stroke: var(--stone); stroke-width: 1.6; stroke-linecap: round; }
+.pic-title { stroke: var(--ink-muted); stroke-width: 2.2; stroke-linecap: round; }
+.pic-fill { fill: var(--sunken); }
+.option-tile.chosen .pic-title { stroke: var(--forest); }
+.option-tile.chosen .pic-fill { fill: var(--mint); }
+@media (prefers-reduced-motion: reduce) {
+  .option-tile { transition: none; }
+}
 /* A rainbow, on purpose: it stands for "any colour" in the colour menu */
 .swatch-rainbow { position: relative; background: conic-gradient(red, orange, yellow, lime, cyan, blue, magenta, red); }
 /* "Color personalizado": a pill as wide as the rows of swatches, its content centred, so it lines

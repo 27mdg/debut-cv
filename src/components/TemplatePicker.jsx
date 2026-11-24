@@ -2,10 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import texts from '../locales/index.js'
 import templates from '../templates/list.js'
 import { prefersReducedMotion } from './useLeaving.js'
+import Segmented from './Segmented.jsx'
+import { TuneIcon } from './Icons.jsx'
 
 const thumbnailWidth = 150
 
-function Thumbnail({ id }) {
+/** The first page of a template filled with the sample CV, drawn once it scrolls into view. */
+export function Thumbnail({ id }) {
   const box = useRef(null)
   const [src, setSrc] = useState(null)
 
@@ -68,25 +71,44 @@ function useWheelSideways(strip) {
   }, [strip])
 }
 
-function TemplatePicker({ selected, onSelect }) {
+// The tabs: every group that has a look, in this order. The first templates have no group and
+// only show under «Todas».
+const groupOrder = ['classic', 'modern', 'compact', 'creative']
+const groups = ['all', ...groupOrder.filter((group) => templates.some((t) => t.group === group))]
+
+// onCustomize: opens «Modo diseño»; left out while it is open
+function TemplatePicker({ selected, onSelect, onCustomize }) {
   const strip = useRef(null)
   useWheelSideways(strip)
+  const [group, setGroup] = useState('all')
+  const shown = group === 'all' ? templates : templates.filter((t) => t.group === group)
 
   return (
-    <div className="template-picker" ref={strip}>
-      {templates.map(({ id }) => (
-        <button
-          key={id}
-          type="button"
-          className={id === selected ? 'template-card selected' : 'template-card'}
-          aria-pressed={id === selected}
-          onClick={() => onSelect(id)}
-        >
-          <Thumbnail id={id}/>
-          <span className="template-name">{texts.templates[id]}</span>
-        </button>
-      ))}
-    </div>
+    <>
+      <div className="template-picker-head">
+        <Segmented label={texts.tools.templates} value={group} onChange={setGroup}
+          options={groups.map((value) => ({ value, label: texts.templateGroups[value] }))}/>
+        {onCustomize && (
+          <button type="button" className="btn btn-primary btn-small" onClick={onCustomize}>
+            <TuneIcon/>{texts.design.customize}
+          </button>
+        )}
+      </div>
+      <div className="template-picker" ref={strip}>
+        {shown.map(({ id }) => (
+          <button
+            key={id}
+            type="button"
+            className={id === selected ? 'template-card selected' : 'template-card'}
+            aria-pressed={id === selected}
+            onClick={() => onSelect(id)}
+          >
+            <Thumbnail id={id}/>
+            <span className="template-name">{texts.templates[id]}</span>
+          </button>
+        ))}
+      </div>
+    </>
   )
 }
 

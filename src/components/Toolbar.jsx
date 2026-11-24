@@ -14,9 +14,11 @@ import {
   FullScreenIcon,
 } from './Icons.jsx'
 
-// language: the CV's own ('' already turned into the site's by PreviewPanel)
+// language: the CV's own ('' already turned into the site's by PreviewPanel).
+// onCustomize: opens «Modo diseño» (left out while it is open)
 function Toolbar({
   template, onTemplateChange, design, onDesignChange, language, onLanguageChange, fullScreen, onFullScreenChange,
+  onCustomize,
 }) {
   const info = templateInfo(template)
   const chosenLanguage = cvLanguages.find((l) => l.code === language)
@@ -27,7 +29,10 @@ function Toolbar({
     <div className="toolbar-dock">
       <div className="toolbar frost-behind">
         <ToolMenu icon={<TemplatesIcon/>} label={texts.tools.templates} wide>
-          {() => <TemplatePicker selected={info.id} onSelect={onTemplateChange}/>}
+          {(close) => (
+            <TemplatePicker selected={info.id} onSelect={onTemplateChange}
+              onCustomize={onCustomize && (() => { close(); onCustomize() })}/>
+          )}
         </ToolMenu>
         <ToolMenu icon={<FontIcon/>} label={fontOf(design, info.defaultFont).name}>
           {() => <FontMenu design={design} defaultFont={info.defaultFont} onChange={onDesignChange}/>}
