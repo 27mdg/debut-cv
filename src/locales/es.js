@@ -439,6 +439,7 @@ const es = {
     signature: 'Has borrado la firma.',
     cv: (name) => `Has eliminado «${name}».`,
     version: (when) => `Has vuelto a la versión «${when}».`,
+    template: (name) => `Has cambiado a «${name}».`,
   },
   history: {
     open: 'Historial de este CV',

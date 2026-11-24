@@ -224,15 +224,27 @@ function App() {
     changeSection('signature', (signature) => ({ ...signature, [field]: value }))
   }, [changeSection])
 
-  // A new template or look starts with its own colour, font and options, so it looks like its thumbnail
+  // The CV as last drawn, for stable callbacks that must know what they replace (changeTemplate)
+  const latestCv = useRef(cv)
+  useEffect(() => {
+    latestCv.current = cv
+  }, [cv])
+
+  // A new template or look starts with its own colour, font and options, so it looks like its
+  // thumbnail. That wipes the user's own options, so «Deshacer» brings back the previous design.
   const changeTemplate = useCallback((id) => {
+    const { template, design } = latestCv.current
+    if (id === template) return
     const look = lookInfo(id)
     setCv((previous) => ({
       ...previous,
       template: id,
       design: look ? withLook(previous.design, look) : { ...previous.design, color: '', font: '' },
     }))
-  }, [])
+    offerUndo(texts.undo.template(texts.templates[id] ?? id), () => {
+      setCv((previous) => ({ ...previous, template, design }))
+    })
+  }, [offerUndo])
 
   // What is still waiting to be saved of the open CV, written now (before opening another)
   function saveNow() {
